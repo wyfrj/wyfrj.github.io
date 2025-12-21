@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时间卡片备忘录</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 页面样式 */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* 时间卡片样式 - 保留原有效果 */
+        .time-card {
+            width: 100%;
+            height: 200px;
+            background: rgb(17, 4, 134);
+            border-radius: 15px;
+            box-shadow: rgb(0,0,0,0.7) 5px 10px 50px ,rgb(0,0,0,0.7) -5px 0px 250px;
+            display: flex;
+            color: white;
+            justify-content: center;
+            position: relative;
+            flex-direction: column;
+            background: linear-gradient(to right, rgb(20, 30, 48), rgb(36, 59, 85));
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            overflow: hidden;
+        }
+
+        .time-card:hover {
+            box-shadow: rgb(0,0,0) 5px 10px 50px ,rgb(0,0,0) -5px 0px 250px;
+            transform: translateY(-5px);
+        }
+
+        .time-text {
+            font-size: 50px;
+            margin-top: 0px;
+            margin-left: 15px;
+            font-weight: 600;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+
+        .time-sub-text {
+            font-size: 15px;
+            margin-left: 5px;
+        }
+
+        .day-text {
+            font-size: 18px;
+            margin-top: 0px;
+            margin-left: 15px;
+            font-weight: 500;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+
+        .moon {
+            font-size: 20px;
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .time-card:hover > .moon {
+            font-size: 23px;
+        }
+
+        /* 备忘录功能区域 */
+        .memo-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 创建卡片表单 */
+        .create-card-form {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+
+        .create-btn .front {
+            background: rgba(76, 175, 80, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .create-btn:hover .front {
+            background: rgba(69, 160, 73, 0.9);
+        }
+
+        /* 卡片容器 */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        /* 3D卡片容器 */
+        .memo-parent {
+            width: 100%;
+            padding: 10px;
+            perspective: 1000px;
+        }
+
+        /* 备忘录卡片样式 - 应用3D效果 */
+        .memo-card {
+            padding-top: 30px;
+            border: 3px solid rgb(255, 255, 255);
+            transform-style: preserve-3d;
+            background: linear-gradient(135deg,#0000 18.75%,#f3f3f3 0 31.25%,#0000 0),
+                repeating-linear-gradient(45deg,#f3f3f3 -6.25% 6.25%,#ffffff 0 18.75%);
+            background-size: 60px 60px;
+            background-position: 0 0, 0 0;
+            background-color: #f0f0f0;
+            width: 100%;
+            box-shadow: rgba(142, 142, 142, 0.3) 0px 30px 30px -10px;
+            transition: all 0.5s ease-in-out;
+            position: relative;
+            min-height: 150px;
+            border-radius: 10px;
+        }
+
+        .memo-card:hover {
+            background-position: -100px 100px, -100px 100px;
+            transform: rotate3d(0.5, 1, 0, 15deg);
+        }
+
+        .memo-content-box {
+            background: rgba(4, 193, 250, 0.732);
+            transition: all 0.5s ease-in-out;
+            padding: 40px 15px 15px 15px;
+            transform-style: preserve-3d;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .memo-title {
+            display: inline-block;
+            color: white;
+            font-size: 18px;
+            font-weight: 900;
+            transition: all 0.5s ease-in-out;
+            transform: translate3d(0px, 0px, 30px);
+            margin-bottom: 8px;
+        }
+
+        .memo-title:hover {
+            transform: translate3d(0px, 0px, 40px);
+        }
+
+        .memo-content {
+            margin-top: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #f2f2f2;
+            transition: all 0.5s ease-in-out;
+            transform: translate3d(0px, 0px, 20px);
+            line-height: 1.4;
+        }
+
+        .memo-content:hover {
+            transform: translate3d(0px, 0px, 40px);
+        }
+
+        .memo-date {
+            font-size: 11px;
+            color: #f2f2f2;
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            transform: translate3d(0px, 0px, 25px);
+        }
+
+        .memo-date-box {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            height: 40px;
+            width: 40px;
+            background: white;
+            border: 1px solid rgb(7, 185, 255);
+            padding: 5px;
+            transform: translate3d(0px, 0px, 50px);
+            box-shadow: rgba(100, 100, 111, 0.2) 0px 10px 10px -10px;
+            border-radius: 5px;
+        }
+
+        .memo-date-box span {
+            display: block;
+            text-align: center;
+        }
+
+        .memo-date-box .memo-month {
+            color: rgb(4, 193, 250);
+            font-size: 8px;
+            font-weight: 700;
+        }
+
+        .memo-date-box .memo-day {
+            font-size: 14px;
+            font-weight: 900;
+            color: rgb(4, 193, 250);
+        }
+
+        .delete-btn .front {
+            background: rgba(255, 68, 68, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-btn:hover .front {
+            background: rgba(204, 0, 0, 0.9);
+        }
+
+        /* 操作按钮容器 */
+        .memo-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            justify-content: flex-end;
+        }
+
+        /* 操作按钮样式 */
+        .action-btn .front {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+        }
+
+        .action-btn:hover .front {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .clear-btn {
+            background: rgba(255, 100, 100, 0.3);
+        }
+
+        .clear-btn:hover {
+            background: rgba(255, 100, 100, 0.5);
+        }
+
+        .edit-btn {
+            background: rgba(100, 200, 255, 0.3);
+        }
+
+        .edit-btn:hover {
+            background: rgba(100, 200, 255, 0.5);
+        }
+
+        /* 空状态提示 */
+        .empty-state {
+            text-align: center;
+            color: #666;
+            font-size: 16px;
+            padding: 20px;
+        }
+
+        /* Uiverse.io 3D按钮样式 */
+        .button {
+            position: relative;
+            border: none;
+            background: transparent;
+            padding: 0;
+            outline: none;
+            cursor: pointer;
+            font-family: sans-serif;
+        }
+
+        /* Shadow layer */
+        .button .shadow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 8px;
+            transform: translateY(2px);
+            transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
+        }
+
+        /* Edge layer */
+        .button .edge {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            background: linear-gradient(
+                to left,
+                hsl(217, 33%, 16%) 0%,
+                hsl(217, 33%, 32%) 8%,
+                hsl(217, 33%, 32%) 92%,
+                hsl(217, 33%, 16%) 100%
+            );
+        }
+
+        /* Front layer */
+        .button .front {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            font-size: 14px;
+            color: white;
+            background: hsl(217, 33%, 17%);
+            border-radius: 6px;
+            transform: translateY(-4px);
+            transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
+        }
+
+        /* Hover and active states */
+        .button:hover .shadow {
+            transform: translateY(4px);
+            transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
+        }
+
+        .button:hover .front {
+            transform: translateY(-6px);
+            transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
+        }
+
+        .button:active .shadow {
+            transform: translateY(1px);
+            transition: transform 34ms;
+        }
+
+        .button:active .front {
+            transform: translateY(-2px);
+            transition: transform 34ms;
+        }
+
+        /* Disable text selection */
+        .button .front span {
+            user-select: none;
+        }
+
+        /* Uiverse.io 消息输入框样式 */
+        .messageBox {
+            width: 100%;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #2d2d2d;
+            padding: 0 15px;
+            border-radius: 10px;
+            border: 1px solid rgb(63, 63, 63);
+            margin-bottom: 15px;
+        }
+        
+        .messageBox:focus-within {
+            border: 1px solid rgb(110, 110, 110);
+        }
+        
+        .messageInput {
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            outline: none;
+            border: none;
+            padding-left: 10px;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .messageInput::placeholder {
+            color: #aaa;
+        }
+        
+        .messageInput:focus + .sendButton svg path,
+        .messageInput:valid + .sendButton svg path {
+            fill: #3c3c3c;
+            stroke: white;
+        }
+        
+        .sendButton {
+            width: fit-content;
+            height: 100%;
+            background-color: transparent;
+            outline: none;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .sendButton svg {
+            height: 18px;
+            transition: all 0.3s;
+        }
+        
+        .sendButton svg path {
+            transition: all 0.3s;
+        }
+        
+        .sendButton:hover svg path {
+            fill: #3c3c3c;
+            stroke: white;
+        }
+        
+        /* Uiverse.io neumorphism输入框样式 */
+        .input {
+            border: none;
+            padding: 1rem;
+            border-radius: 1rem;
+            background: #e8e8e8;
+            box-shadow: 20px 20px 60px #c5c5c5,
+                    -20px -20px 60px #ffffff;
+            transition: 0.3s;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .input:focus {
+            outline-color: #e8e8e8;
+            background: #e8e8e8;
+            box-shadow: inset 20px 20px 60px #c5c5c5,
+                    inset -20px -20px 60px #ffffff;
+            transition: 0.3s;
+        }
+
+        .input::placeholder {
+            color: #666;
+        }
+
+        /* 设置面板样式 */
+        .settings-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            min-width: 200px;
+        }
+
+
+
+        .settings-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            text-align: center;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .setting-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Uiverse.io 开关按钮样式 */
+        .checkbox-wrapper-8 .tgl {
+            display: none;
+        }
+
+        .checkbox-wrapper-8 .tgl,
+        .checkbox-wrapper-8 .tgl:after,
+        .checkbox-wrapper-8 .tgl:before,
+        .checkbox-wrapper-8 .tgl *,
+        .checkbox-wrapper-8 .tgl *:after,
+        .checkbox-wrapper-8 .tgl *:before,
+        .checkbox-wrapper-8 .tgl + .tgl-btn {
+            box-sizing: border-box;
+        }
+
+        .checkbox-wrapper-8 .tgl::-moz-selection,
+        .checkbox-wrapper-8 .tgl:after::-moz-selection,
+        .checkbox-wrapper-8 .tgl:before::-moz-selection,
+        .checkbox-wrapper-8 .tgl *::-moz-selection,
+        .checkbox-wrapper-8 .tgl *:after::-moz-selection,
+        .checkbox-wrapper-8 .tgl *:before::-moz-selection,
+        .checkbox-wrapper-8 .tgl + .tgl-btn::-moz-selection,
+        .checkbox-wrapper-8 .tgl::selection,
+        .checkbox-wrapper-8 .tgl:after::selection,
+        .checkbox-wrapper-8 .tgl:before::selection,
+        .checkbox-wrapper-8 .tgl *::selection,
+        .checkbox-wrapper-8 .tgl *:after::selection,
+        .checkbox-wrapper-8 .tgl *:before::selection,
+        .checkbox-wrapper-8 .tgl + .tgl-btn::selection {
+            background: none;
+        }
+
+        .checkbox-wrapper-8 .tgl + .tgl-btn {
+            outline: 0;
+            display: block;
+            width: 4em;
+            height: 2em;
+            position: relative;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .checkbox-wrapper-8 .tgl + .tgl-btn:after,
+        .checkbox-wrapper-8 .tgl + .tgl-btn:before {
+            position: relative;
+            display: block;
+            content: "";
+            width: 50%;
+            height: 100%;
+        }
+
+        .checkbox-wrapper-8 .tgl + .tgl-btn:after {
+            left: 0;
+        }
+
+        .checkbox-wrapper-8 .tgl + .tgl-btn:before {
+            display: none;
+        }
+
+        .checkbox-wrapper-8 .tgl:checked + .tgl-btn:after {
+            left: 50%;
+        }
+
+        .checkbox-wrapper-8 .tgl-skewed + .tgl-btn {
+            overflow: hidden;
+            transform: skew(-10deg);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            transition: all 0.2s ease;
+            font-family: sans-serif;
+            background: #888;
+        }
+
+        .checkbox-wrapper-8 .tgl-skewed + .tgl-btn:after,
+        .checkbox-wrapper-8 .tgl-skewed + .tgl-btn:before {
+            transform: skew(10deg);
+            display: inline-block;
+            transition: all 0.2s ease;
+            width: 100%;
+            text-align: center;
+            position: absolute;
+            line-height: 2em;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .checkbox-wrapper-8 .tgl-skewed + .tgl-btn:after {
+            left: 100%;
+            content: attr(data-tg-on);
+        }
+
+        .checkbox-wrapper-8 .tgl-skewed + .tgl-btn:before {
+            left: 0;
+            content: attr(data-tg-off);
+        }
+
+        .checkbox-wrapper-8 .tgl-skewed + .tgl-btn:active {
+            background: #888;
+        }
+
+        .checkbox-wrapper-8 .tgl-skewed + .tgl-btn:active:before {
+            left: -10%;
+        }
+
+        .checkbox-wrapper-8 .tgl-skewed:checked + .tgl-btn {
+            background: #86d993;
+        }
+
+        .checkbox-wrapper-8 .tgl-skewed:checked + .tgl-btn:before {
+            left: -100%;
+        }
+
+        .checkbox-wrapper-8 .tgl-skewed:checked + .tgl-btn:after {
+            left: 0;
+        }
+
+        .checkbox-wrapper-8 .tgl-skewed:checked + .tgl-btn:active:after {
+            left: 10%;
+        }
+
+        /* Uiverse.io 设置按钮样式 */
+        .setting-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background-color: rgb(129, 110, 216);
+            border-radius: 10px;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0px 0px 0px 2px rgb(212, 209, 255);
+            z-index: 1001;
+            transition: all 0.3s;
+        }
+
+        .bar {
+            width: 50%;
+            height: 2px;
+            background-color: rgb(229, 229, 229);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-radius: 2px;
+        }
+
+        .bar::before {
+            content: "";
+            width: 2px;
+            height: 2px;
+            background-color: rgb(126, 117, 255);
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid white;
+            transition: all 0.3s;
+            box-shadow: 0px 0px 5px white;
+        }
+
+        .bar1::before {
+            transform: translateX(-4px);
+        }
+
+        .bar2::before {
+            transform: translateX(4px);
+        }
+
+        .setting-btn:hover .bar1::before {
+            transform: translateX(4px);
+        }
+
+        .setting-btn:hover .bar2::before {
+            transform: translateX(-4px);
+        }
+
+        .setting-btn:hover {
+            transform: scale(1.1);
+            background-color: rgb(110, 90, 200);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .time-card {
+                height: 150px;
+            }
+            
+            .time-text {
+                font-size: 40px;
+            }
+            
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+
+            .settings-panel {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                min-width: auto;
+            }
+
+            .setting-btn {
+                top: 10px;
+                right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>时间卡片备忘录</h1>
+        
+        <div class="main-content">
+            <!-- 时间卡片 -->
+            <div class="time-card">
+                <div class="moon">🌙</div>
+                <div class="time-text">--:--<span class="time-sub-text">--</span></div>
+                <div class="day-text">--</div>
+            </div>
+
+            <!-- 备忘录功能区域 -->
+            <div class="memo-section">
+                <!-- 创建卡片表单 -->
+                <div class="create-card-form">
+                    <input type="text" id="cardTitle" class="input" placeholder="输入备忘录标题...">
+                    <textarea id="cardContent" class="input" placeholder="输入备忘录内容..." style="height: 80px; resize: vertical;"></textarea>
+                    <button class="button create-btn" onclick="createCard()">
+                        <span class="shadow"></span>
+                        <span class="edge"></span>
+                        <span class="front">创建备忘录</span>
+                    </button>
+                </div>
+
+                <!-- 卡片容器 -->
+                <div class="cards-container" id="cardsContainer">
+                    <!-- 卡片将通过JavaScript动态添加 -->
+                </div>
+
+                <!-- 空状态提示 -->
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    📋 还没有任何备忘录，创建一个吧！
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 设置按钮 -->
+    <button class="setting-btn" onclick="toggleSettings()">
+        <div class="bar bar1"></div>
+        <div class="bar bar2"></div>
+    </button>
+
+    <!-- 设置面板 -->
+    <div class="settings-panel" id="settingsPanel" style="display: none;">
+        <div class="settings-title">设置</div>
+        <div class="setting-item">
+            <span class="setting-label">背景</span>
+            <div class="checkbox-wrapper-8">
+                <input type="checkbox" id="glassEffect" class="tgl tgl-skewed" onchange="toggleGlassEffect()">
+                <label class="tgl-btn" data-tg-on="ON" data-tg-off="OFF" for="glassEffect"></label>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化卡片数据
+        let cards = JSON.parse(localStorage.getItem('memoCards')) || [];
+        
+        // 初始化设置
+        let settings = JSON.parse(localStorage.getItem('memoSettings')) || {
+            glassEffect: true
+        };
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 更新时间显示
+            updateTime();
+            setInterval(updateTime, 1000);
+            
+            // 显示所有卡片
+            displayCards();
+            
+            // 应用保存的设置
+            applySettings();
+        });
+
+        // 切换设置面板显示/隐藏
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            const toggle = document.querySelector('.setting-btn');
+            
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+                toggle.style.background = 'rgb(110, 90, 200)';
+                toggle.style.boxShadow = '0px 0px 0px 3px rgb(212, 209, 255)';
+            } else {
+                panel.style.display = 'none';
+                toggle.style.background = 'rgb(129, 110, 216)';
+                toggle.style.boxShadow = '0px 0px 0px 2px rgb(212, 209, 255)';
+            }
+        }
+
+        // 切换毛玻璃效果
+        function toggleGlassEffect() {
+            const checkbox = document.getElementById('glassEffect');
+            settings.glassEffect = checkbox.checked;
+            localStorage.setItem('memoSettings', JSON.stringify(settings));
+            applyGlassEffect();
+        }
+
+        // 应用所有设置
+        function applySettings() {
+            const checkbox = document.getElementById('glassEffect');
+            if (checkbox) {
+                checkbox.checked = settings.glassEffect;
+            }
+            applyGlassEffect();
+        }
+
+        // 应用毛玻璃效果
+        function applyGlassEffect() {
+            const body = document.body;
+            const memoSection = document.querySelector('.memo-section');
+            const timeCard = document.querySelector('.time-card');
+            
+            if (settings.glassEffect) {
+                // 启用毛玻璃效果
+                body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                if (memoSection) {
+                    memoSection.style.background = 'rgba(255, 255, 255, 0.9)';
+                    memoSection.style.backdropFilter = 'blur(10px)';
+                    memoSection.style.webkitBackdropFilter = 'blur(10px)';
+                }
+                if (timeCard) {
+                    timeCard.style.background = 'linear-gradient(to right, rgb(20, 30, 48), rgb(36, 59, 85))';
+                }
+            } else {
+                // 禁用毛玻璃效果
+                body.style.background = '#f0f0f0';
+                if (memoSection) {
+                    memoSection.style.background = '#ffffff';
+                    memoSection.style.backdropFilter = 'none';
+                    memoSection.style.webkitBackdropFilter = 'none';
+                }
+                if (timeCard) {
+                    timeCard.style.background = 'rgb(17, 4, 134)';
+                }
+            }
+        }
+
+        // 实时更新时间显示
+        function updateTime() {
+            const now = new Date();
+            
+            // 获取时间
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            
+            // 转换为12小时制
+            hours = hours % 12;
+            hours = hours ? hours : 12; // 0点显示为12点
+            
+            // 格式化时间，确保两位数显示
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            
+            // 获取星期几
+            const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            const dayOfWeek = weekdays[now.getDay()];
+            
+            // 更新DOM元素
+            const timeElement = document.querySelector('.time-text');
+            const timeSubElement = document.querySelector('.time-sub-text');
+            const dayElement = document.querySelector('.day-text');
+            
+            if (timeElement && timeSubElement && dayElement) {
+                timeElement.innerHTML = `${hours}:${minutes}<span class="time-sub-text">${ampm}</span>`;
+                dayElement.textContent = dayOfWeek;
+            }
+        }
+
+        // 创建新卡片
+        function createCard() {
+            const titleInput = document.getElementById('cardTitle');
+            const contentInput = document.getElementById('cardContent');
+            
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
+            
+            if (!title) {
+                alert('请输入备忘录标题！');
+                titleInput.focus();
+                return;
+            }
+            
+            if (!content) {
+                alert('请输入备忘录内容！');
+                contentInput.focus();
+                return;
+            }
+            
+            const newCard = {
+                id: Date.now(), // 使用时间戳作为唯一ID
+                title: title,
+                content: content,
+                createdAt: new Date().toLocaleString('zh-CN')
+            };
+            
+            cards.unshift(newCard); // 添加到数组开头
+            saveCards();
+            displayCards();
+            
+            // 清空输入框
+            titleInput.value = '';
+            contentInput.value = '';
+            titleInput.focus();
+        }
+
+        // 删除卡片
+        function deleteCard(cardId) {
+            if (confirm('确定要删除这个备忘录吗？')) {
+                cards = cards.filter(card => card.id !== cardId);
+                saveCards();
+                displayCards();
+            }
+        }
+
+        // 清空卡片内容（保留卡片框架）
+        function clearCardContent(cardId) {
+            if (confirm('确定要清空这个备忘录的内容吗？')) {
+                const cardIndex = cards.findIndex(card => card.id === cardId);
+                if (cardIndex !== -1) {
+                    cards[cardIndex].content = '';
+                    saveCards();
+                    displayCards();
+                }
+            }
+        }
+
+        // 编辑卡片内容
+        function editCardContent(cardId) {
+            const card = cards.find(card => card.id === cardId);
+            if (card) {
+                const newContent = prompt('编辑备忘录内容：', card.content);
+                if (newContent !== null) {
+                    card.content = newContent;
+                    saveCards();
+                    displayCards();
+                }
+            }
+        }
+
+        // 保存卡片到localStorage
+        function saveCards() {
+            localStorage.setItem('memoCards', JSON.stringify(cards));
+        }
+
+        // 显示所有卡片
+        function displayCards() {
+            const container = document.getElementById('cardsContainer');
+            const emptyState = document.getElementById('emptyState');
+            
+            container.innerHTML = '';
+            
+            if (cards.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            cards.forEach(card => {
+                const parentElement = document.createElement('div');
+                parentElement.className = 'memo-parent';
+                
+                // 解析创建日期用于日期盒子
+                const createdDate = new Date(card.id);
+                const month = createdDate.getMonth() + 1;
+                const day = createdDate.getDate();
+                
+                parentElement.innerHTML = `
+                    <div class="memo-card">
+                        <button class="button delete-btn" onclick="deleteCard(${card.id})" title="删除整个备忘录">
+                            <span class="shadow"></span>
+                            <span class="edge"></span>
+                            <span class="front">×</span>
+                        </button>
+                        <div class="memo-date-box">
+                            <span class="memo-month">${month}月</span>
+                            <span class="memo-day">${day}</span>
+                        </div>
+                        <div class="memo-content-box">
+                            <div class="memo-title">${escapeHtml(card.title)}</div>
+                            <div class="memo-content" onclick="editCardContent(${card.id})" title="点击编辑内容">
+                                ${card.content ? escapeHtml(card.content) : '<span style="color: #ccc; font-style: italic;">(空内容)</span>'}
+                            </div>
+                            <div class="memo-actions">
+                                <button class="button action-btn clear-btn" onclick="clearCardContent(${card.id})" title="清空内容">
+                                    <span class="shadow"></span>
+                                    <span class="edge"></span>
+                                    <span class="front">清空</span>
+                                </button>
+                                <button class="button action-btn edit-btn" onclick="editCardContent(${card.id})" title="编辑内容">
+                                    <span class="shadow"></span>
+                                    <span class="edge"></span>
+                                    <span class="front">编辑</span>
+                                </button>
+                            </div>
+                            <div class="memo-date">创建于: ${card.createdAt}</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(parentElement);
+            });
+        }
+
+        // HTML转义函数，防止XSS攻击
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 支持按Enter键快速创建（在内容输入框按Enter）
+        document.getElementById('cardContent').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                createCard();
+            }
+        });
+        
+        // 键盘输入时自动滚动到可见区域（避免键盘遮挡）
+        document.getElementById('cardContent').addEventListener('focus', function() {
+            setTimeout(() => {
+                this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        });
+    </script>
+</body>
+</html>

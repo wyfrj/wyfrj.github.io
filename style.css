@@ -1,0 +1,107 @@
+/* 额外的样式增强 */
+
+/* 页面加载动画 */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.container {
+    animation: fadeIn 0.8s ease-out;
+}
+
+/* 卡片入场动画 */
+.memo-parent {
+    animation: slideIn 0.5s ease-out forwards;
+    opacity: 0;
+}
+
+@keyframes slideIn {
+    from { 
+        opacity: 0;
+        transform: translateY(30px) scale(0.9);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* 为每个卡片添加延迟动画 */
+.memo-parent:nth-child(1) { animation-delay: 0.1s; }
+.memo-parent:nth-child(2) { animation-delay: 0.2s; }
+.memo-parent:nth-child(3) { animation-delay: 0.3s; }
+.memo-parent:nth-child(4) { animation-delay: 0.4s; }
+.memo-parent:nth-child(5) { animation-delay: 0.5s; }
+.memo-parent:nth-child(6) { animation-delay: 0.6s; }
+
+/* 打印样式 */
+@media print {
+    .setting-btn,
+    .settings-panel,
+    .create-btn {
+        display: none !important;
+    }
+    
+    .memo-card {
+        break-inside: avoid;
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+    }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+    body:not(.glass-effect-enabled) {
+        background: #1a1a1a;
+    }
+    
+    .memo-section:not(.glass-effect-enabled) {
+        background: #2d2d2d;
+        color: #fff;
+    }
+    
+    .input {
+        background: #333;
+        color: #fff;
+        box-shadow: 20px 20px 60px #1a1a1a,
+                   -20px -20px 60px #404040;
+    }
+    
+    .input:focus {
+        background: #333;
+        box-shadow: inset 20px 20px 60px #1a1a1a,
+                   inset -20px -20px 60px #404040;
+    }
+}
+
+/* 无障碍支持 */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+    .time-card {
+        border: 2px solid white;
+    }
+    
+    .memo-card {
+        border: 2px solid #000;
+    }
+    
+    .button .front {
+        border: 2px solid currentColor;
+    }
+}
