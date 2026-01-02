@@ -1,1215 +1,645 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>时间卡片备忘录</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>个人资源小站</title>
+    
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="../libs/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="../libs/jquery-confirm/css/jquery-confirm.css">
+    <link rel="stylesheet" href="../libs/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="../css/newCss.css">
+    
     <style>
-        /* 页面样式 */
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
+            background-color: #f8f9fa;
+            font-family: 'Microsoft YaHei', sans-serif;
         }
-
+        
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        
         .container {
             max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            color: white;
-            text-align: center;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        /* 主内容区域 */
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        /* 时间卡片样式 - 保留原有效果 */
-        .time-card {
-            width: 100%;
-            height: 200px;
-            background: rgb(17, 4, 134);
-            border-radius: 15px;
-            box-shadow: rgb(0,0,0,0.7) 5px 10px 50px ,rgb(0,0,0,0.7) -5px 0px 250px;
-            display: flex;
-            color: white;
-            justify-content: center;
-            position: relative;
-            flex-direction: column;
-            background: linear-gradient(to right, rgb(20, 30, 48), rgb(36, 59, 85));
-            cursor: pointer;
-            transition: all 0.3s ease-in-out;
-            overflow: hidden;
-        }
-
-        .time-card:hover {
-            box-shadow: rgb(0,0,0) 5px 10px 50px ,rgb(0,0,0) -5px 0px 250px;
-            transform: translateY(-5px);
-        }
-
-        .time-text {
-            font-size: 50px;
-            margin-top: 0px;
-            margin-left: 15px;
-            font-weight: 600;
-            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-        }
-
-        .time-sub-text {
-            font-size: 15px;
-            margin-left: 5px;
-        }
-
-        .day-text {
-            font-size: 18px;
-            margin-top: 0px;
-            margin-left: 15px;
-            font-weight: 500;
-            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-        }
-
-        .moon {
-            font-size: 20px;
-            position: absolute;
-            right: 15px;
-            top: 15px;
-            transition: all 0.3s ease-in-out;
-        }
-
-        .time-card:hover > .moon {
-            font-size: 23px;
-        }
-
-        /* 备忘录功能区域 */
-        .memo-section {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        /* 创建卡片表单 */
-        .create-card-form {
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-
-        .form-group textarea {
-            height: 80px;
-            resize: vertical;
-        }
-
-        .create-btn .front {
-            background: rgba(76, 175, 80, 0.8);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .create-btn:hover .front {
-            background: rgba(69, 160, 73, 0.9);
-        }
-
-        /* 卡片容器 */
-        .cards-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
             margin-top: 20px;
         }
-
-        /* 3D卡片容器 */
-        .memo-parent {
-            width: 100%;
-            padding: 10px;
-            perspective: 1000px;
-        }
-
-        /* 备忘录卡片样式 - 应用3D效果 */
-        .memo-card {
-            padding-top: 30px;
-            border: 3px solid rgb(255, 255, 255);
-            transform-style: preserve-3d;
-            background: linear-gradient(135deg,#0000 18.75%,#f3f3f3 0 31.25%,#0000 0),
-                repeating-linear-gradient(45deg,#f3f3f3 -6.25% 6.25%,#ffffff 0 18.75%);
-            background-size: 60px 60px;
-            background-position: 0 0, 0 0;
-            background-color: #f0f0f0;
-            width: 100%;
-            box-shadow: rgba(142, 142, 142, 0.3) 0px 30px 30px -10px;
-            transition: all 0.5s ease-in-out;
-            position: relative;
-            min-height: 150px;
+        
+        .post-card {
+            margin-bottom: 20px;
             border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.1);
+            transition: transform 0.3s;
         }
-
-        .memo-card:hover {
-            background-position: -100px 100px, -100px 100px;
-            transform: rotate3d(0.5, 1, 0, 15deg);
+        
+        .post-card:hover {
+            transform: translateY(-5px);
         }
-
-        .memo-content-box {
-            background: rgba(4, 193, 250, 0.732);
-            transition: all 0.5s ease-in-out;
-            padding: 40px 15px 15px 15px;
-            transform-style: preserve-3d;
-            border-radius: 0 0 10px 10px;
+        
+        .post-title {
+            color: #2c3e50;
+            font-weight: bold;
         }
-
-        .memo-title {
-            display: inline-block;
-            color: white;
-            font-size: 18px;
-            font-weight: 900;
-            transition: all 0.5s ease-in-out;
-            transform: translate3d(0px, 0px, 30px);
-            margin-bottom: 8px;
+        
+        .post-content {
+            color: #555;
+            line-height: 1.6;
         }
-
-        .memo-title:hover {
-            transform: translate3d(0px, 0px, 40px);
+        
+        .post-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
         }
-
-        .memo-content {
-            margin-top: 10px;
-            font-size: 12px;
-            font-weight: 700;
-            color: #f2f2f2;
-            transition: all 0.5s ease-in-out;
-            transform: translate3d(0px, 0px, 20px);
-            line-height: 1.4;
-        }
-
-        .memo-content:hover {
-            transform: translate3d(0px, 0px, 40px);
-        }
-
-        .memo-date {
-            font-size: 11px;
-            color: #f2f2f2;
-            position: absolute;
-            bottom: 10px;
-            right: 15px;
-            transform: translate3d(0px, 0px, 25px);
-        }
-
-        .memo-date-box {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            height: 40px;
-            width: 40px;
-            background: white;
-            border: 1px solid rgb(7, 185, 255);
-            padding: 5px;
-            transform: translate3d(0px, 0px, 50px);
-            box-shadow: rgba(100, 100, 111, 0.2) 0px 10px 10px -10px;
-            border-radius: 5px;
-        }
-
-        .memo-date-box span {
-            display: block;
-            text-align: center;
-        }
-
-        .memo-date-box .memo-month {
-            color: rgb(4, 193, 250);
-            font-size: 8px;
-            font-weight: 700;
-        }
-
-        .memo-date-box .memo-day {
-            font-size: 14px;
-            font-weight: 900;
-            color: rgb(4, 193, 250);
-        }
-
-        .delete-btn .front {
-            background: rgba(255, 68, 68, 0.8);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .delete-btn:hover .front {
-            background: rgba(204, 0, 0, 0.9);
-        }
-
-        /* 操作按钮容器 */
-        .memo-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-            justify-content: flex-end;
-        }
-
-        /* 操作按钮样式 */
-        .action-btn .front {
-            background: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            padding: 4px 8px;
-            border-radius: 3px;
-            font-size: 10px;
-        }
-
-        .action-btn:hover .front {
-            background: rgba(255, 255, 255, 0.5);
-        }
-
-        .clear-btn {
-            background: rgba(255, 100, 100, 0.3);
-        }
-
-        .clear-btn:hover {
-            background: rgba(255, 100, 100, 0.5);
-        }
-
-        .edit-btn {
-            background: rgba(100, 200, 255, 0.3);
-        }
-
-        .edit-btn:hover {
-            background: rgba(100, 200, 255, 0.5);
-        }
-
-        /* 空状态提示 */
-        .empty-state {
-            text-align: center;
-            color: #666;
-            font-size: 16px;
+        
+        .admin-panel {
+            background-color: #f8f9fa;
+            border-radius: 10px;
             padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid #dee2e6;
         }
-
-        /* Uiverse.io 3D按钮样式 */
-        .button {
-            position: relative;
-            border: none;
-            background: transparent;
-            padding: 0;
-            outline: none;
-            cursor: pointer;
-            font-family: sans-serif;
-        }
-
-        /* Shadow layer */
-        .button .shadow {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.25);
-            border-radius: 8px;
-            transform: translateY(2px);
-            transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
-        }
-
-        /* Edge layer */
-        .button .edge {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 8px;
-            background: linear-gradient(
-                to left,
-                hsl(217, 33%, 16%) 0%,
-                hsl(217, 33%, 32%) 8%,
-                hsl(217, 33%, 32%) 92%,
-                hsl(217, 33%, 16%) 100%
-            );
-        }
-
-        /* Front layer */
-        .button .front {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 16px;
-            font-size: 14px;
-            color: white;
-            background: hsl(217, 33%, 17%);
-            border-radius: 6px;
-            transform: translateY(-4px);
-            transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
-        }
-
-        /* Hover and active states */
-        .button:hover .shadow {
-            transform: translateY(4px);
-            transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
-        }
-
-        .button:hover .front {
-            transform: translateY(-6px);
-            transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
-        }
-
-        .button:active .shadow {
-            transform: translateY(1px);
-            transition: transform 34ms;
-        }
-
-        .button:active .front {
-            transform: translateY(-2px);
-            transition: transform 34ms;
-        }
-
-        /* Disable text selection */
-        .button .front span {
-            user-select: none;
-        }
-
-        /* Uiverse.io 消息输入框样式 */
-        .messageBox {
-            width: 100%;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #2d2d2d;
-            padding: 0 15px;
+        
+        .modal-content {
             border-radius: 10px;
-            border: 1px solid rgb(63, 63, 63);
-            margin-bottom: 15px;
         }
         
-        .messageBox:focus-within {
-            border: 1px solid rgb(110, 110, 110);
-        }
-        
-        .messageInput {
-            width: 100%;
-            height: 100%;
-            background-color: transparent;
-            outline: none;
-            border: none;
-            padding-left: 10px;
+        .btn-admin {
+            background-color: #3498db;
             color: white;
-            font-size: 14px;
-        }
-        
-        .messageInput::placeholder {
-            color: #aaa;
-        }
-        
-        .messageInput:focus + .sendButton svg path,
-        .messageInput:valid + .sendButton svg path {
-            fill: #3c3c3c;
-            stroke: white;
-        }
-        
-        .sendButton {
-            width: fit-content;
-            height: 100%;
-            background-color: transparent;
-            outline: none;
             border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
         }
         
-        .sendButton svg {
-            height: 18px;
-            transition: all 0.3s;
+        .btn-admin:hover {
+            background-color: #2980b9;
         }
         
-        .sendButton svg path {
-            transition: all 0.3s;
-        }
-        
-        .sendButton:hover svg path {
-            fill: #3c3c3c;
-            stroke: white;
-        }
-        
-        /* Uiverse.io neumorphism输入框样式 */
-        .input {
+        .btn-post {
+            background-color: #2ecc71;
+            color: white;
             border: none;
-            padding: 1rem;
-            border-radius: 1rem;
-            background: #e8e8e8;
-            box-shadow: 20px 20px 60px #c5c5c5,
-                    -20px -20px 60px #ffffff;
-            transition: 0.3s;
-            width: 100%;
-            box-sizing: border-box;
-            font-size: 14px;
-            margin-bottom: 15px;
         }
-
-        .input:focus {
-            outline-color: #e8e8e8;
-            background: #e8e8e8;
-            box-shadow: inset 20px 20px 60px #c5c5c5,
-                    inset -20px -20px 60px #ffffff;
-            transition: 0.3s;
+        
+        .btn-post:hover {
+            background-color: #27ae60;
         }
-
-        .input::placeholder {
-            color: #666;
+        
+        .btn-edit {
+            background-color: #f39c12;
+            color: white;
+            border: none;
         }
-
-        /* 设置面板样式 */
-        .settings-panel {
+        
+        .btn-edit:hover {
+            background-color: #d68910;
+        }
+        
+        .btn-delete {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+        }
+        
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+        
+        .login-modal {
+            display: none;
             position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             z-index: 1000;
-            min-width: 200px;
-        }
-
-
-
-        .settings-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #333;
-            text-align: center;
-        }
-
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .setting-label {
-            font-size: 14px;
-            color: #666;
-        }
-
-        /* Uiverse.io 开关按钮样式 */
-        .checkbox-wrapper-8 .tgl {
-            display: none;
-        }
-
-        .checkbox-wrapper-8 .tgl,
-        .checkbox-wrapper-8 .tgl:after,
-        .checkbox-wrapper-8 .tgl:before,
-        .checkbox-wrapper-8 .tgl *,
-        .checkbox-wrapper-8 .tgl *:after,
-        .checkbox-wrapper-8 .tgl *:before,
-        .checkbox-wrapper-8 .tgl + .tgl-btn {
-            box-sizing: border-box;
-        }
-
-        .checkbox-wrapper-8 .tgl::-moz-selection,
-        .checkbox-wrapper-8 .tgl:after::-moz-selection,
-        .checkbox-wrapper-8 .tgl:before::-moz-selection,
-        .checkbox-wrapper-8 .tgl *::-moz-selection,
-        .checkbox-wrapper-8 .tgl *:after::-moz-selection,
-        .checkbox-wrapper-8 .tgl *:before::-moz-selection,
-        .checkbox-wrapper-8 .tgl + .tgl-btn::-moz-selection,
-        .checkbox-wrapper-8 .tgl::selection,
-        .checkbox-wrapper-8 .tgl:after::selection,
-        .checkbox-wrapper-8 .tgl:before::selection,
-        .checkbox-wrapper-8 .tgl *::selection,
-        .checkbox-wrapper-8 .tgl *:after::selection,
-        .checkbox-wrapper-8 .tgl *:before::selection,
-        .checkbox-wrapper-8 .tgl + .tgl-btn::selection {
-            background: none;
-        }
-
-        .checkbox-wrapper-8 .tgl + .tgl-btn {
-            outline: 0;
-            display: block;
-            width: 4em;
-            height: 2em;
-            position: relative;
-            cursor: pointer;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        .checkbox-wrapper-8 .tgl + .tgl-btn:after,
-        .checkbox-wrapper-8 .tgl + .tgl-btn:before {
-            position: relative;
-            display: block;
-            content: "";
-            width: 50%;
-            height: 100%;
-        }
-
-        .checkbox-wrapper-8 .tgl + .tgl-btn:after {
             left: 0;
-        }
-
-        .checkbox-wrapper-8 .tgl + .tgl-btn:before {
-            display: none;
-        }
-
-        .checkbox-wrapper-8 .tgl:checked + .tgl-btn:after {
-            left: 50%;
-        }
-
-        .checkbox-wrapper-8 .tgl-skewed + .tgl-btn {
-            overflow: hidden;
-            transform: skew(-10deg);
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-            transition: all 0.2s ease;
-            font-family: sans-serif;
-            background: #888;
-        }
-
-        .checkbox-wrapper-8 .tgl-skewed + .tgl-btn:after,
-        .checkbox-wrapper-8 .tgl-skewed + .tgl-btn:before {
-            transform: skew(10deg);
-            display: inline-block;
-            transition: all 0.2s ease;
+            top: 0;
             width: 100%;
-            text-align: center;
-            position: absolute;
-            line-height: 2em;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
         }
-
-        .checkbox-wrapper-8 .tgl-skewed + .tgl-btn:after {
-            left: 100%;
-            content: attr(data-tg-on);
-        }
-
-        .checkbox-wrapper-8 .tgl-skewed + .tgl-btn:before {
-            left: 0;
-            content: attr(data-tg-off);
-        }
-
-        .checkbox-wrapper-8 .tgl-skewed + .tgl-btn:active {
-            background: #888;
-        }
-
-        .checkbox-wrapper-8 .tgl-skewed + .tgl-btn:active:before {
-            left: -10%;
-        }
-
-        .checkbox-wrapper-8 .tgl-skewed:checked + .tgl-btn {
-            background: #86d993;
-        }
-
-        .checkbox-wrapper-8 .tgl-skewed:checked + .tgl-btn:before {
-            left: -100%;
-        }
-
-        .checkbox-wrapper-8 .tgl-skewed:checked + .tgl-btn:after {
-            left: 0;
-        }
-
-        .checkbox-wrapper-8 .tgl-skewed:checked + .tgl-btn:active:after {
-            left: 10%;
-        }
-
-        /* Uiverse.io 设置按钮样式 */
-        .setting-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 45px;
-            height: 45px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            background-color: rgb(129, 110, 216);
+        
+        .login-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
             border-radius: 10px;
+            width: 400px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
             cursor: pointer;
-            border: none;
-            box-shadow: 0px 0px 0px 2px rgb(212, 209, 255);
-            z-index: 1001;
-            transition: all 0.3s;
         }
-
-        .bar {
-            width: 50%;
-            height: 2px;
-            background-color: rgb(229, 229, 229);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            border-radius: 2px;
+        
+        .close:hover {
+            color: #000;
         }
-
-        .bar::before {
-            content: "";
-            width: 2px;
-            height: 2px;
-            background-color: rgb(126, 117, 255);
-            position: absolute;
-            border-radius: 50%;
-            border: 2px solid white;
-            transition: all 0.3s;
-            box-shadow: 0px 0px 5px white;
+        
+        .form-group {
+            margin-bottom: 20px;
         }
-
-        .bar1::before {
-            transform: translateX(-4px);
+        
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            padding: 10px;
         }
-
-        .bar2::before {
-            transform: translateX(4px);
+        
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 0.2rem rgba(52,152,219,.25);
         }
-
-        .setting-btn:hover .bar1::before {
-            transform: translateX(4px);
+        
+        .alert {
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 15px;
         }
-
-        .setting-btn:hover .bar2::before {
-            transform: translateX(-4px);
+        
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
         }
-
-        .setting-btn:hover {
-            transform: scale(1.1);
-            background-color: rgb(110, 90, 200);
-        }
-
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .time-card {
-                height: 150px;
-            }
-            
-            .time-text {
-                font-size: 40px;
-            }
-            
-            .cards-container {
-                grid-template-columns: 1fr;
-            }
-
-            .settings-panel {
-                top: 10px;
-                right: 10px;
-                left: 10px;
-                min-width: auto;
-            }
-
-            .setting-btn {
-                top: 10px;
-                right: 10px;
-            }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>时间卡片备忘录</h1>
-        
-        <div class="main-content">
-            <!-- 时间卡片 -->
-            <div class="time-card">
-                <div class="moon">🌙</div>
-                <div class="time-text">--:--<span class="time-sub-text">--</span></div>
-                <div class="day-text">--</div>
-            </div>
-
-            <!-- 备忘录功能区域 -->
-            <div class="memo-section">
-                <!-- 创建卡片表单 -->
-                <div class="create-card-form">
-                    <input type="text" id="cardTitle" class="input" placeholder="输入备忘录标题...">
-                    <textarea id="cardContent" class="input" placeholder="输入备忘录内容..." style="height: 80px; resize: vertical;"></textarea>
-                    <button class="button create-btn" onclick="createCard()">
-                        <span class="shadow"></span>
-                        <span class="edge"></span>
-                        <span class="front">创建备忘录</span>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    个人资源小站
+                </a>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">资源分类</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">关于</a>
+                        </li>
+                    </ul>
+                    
+                    <!-- 右上角管理员登录按钮 -->
+                    <button id="adminLoginBtn" class="btn btn-admin">
+                        管理员登录
                     </button>
                 </div>
+        </div>
+    </nav>
 
-                <!-- 卡片容器 -->
-                <div class="cards-container" id="cardsContainer">
-                    <!-- 卡片将通过JavaScript动态添加 -->
+    <!-- 主要内容区域 -->
+    <main class="container">
+        <!-- 欢迎区域 -->
+        <div class="jumbotron bg-light p-5 rounded mt-4">
+            <h1 class="display-4">欢迎来到个人资源小站</h1>
+            <p class="lead">这里收集了各种有用的资源、工具和学习资料，方便随时查阅和使用。</p>
+            <hr class="my-4">
+            <p>您可以浏览下面的资源</p>
+        </div>
+
+        <!-- 管理员面板（登录后显示） -->
+        <div id="adminPanel" class="admin-panel" style="display: none;">
+                <h3>管理员面板</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <button id="newPostBtn" class="btn btn-post mb-3">
+                        新建帖子
+                    </button>
                 </div>
-
-                <!-- 空状态提示 -->
-                <div class="empty-state" id="emptyState" style="display: none;">
-                    📋 还没有任何备忘录，创建一个吧！
+                <div class="col-md-6 text-end">
+                    <button id="logoutBtn" class="btn btn-danger">
+                        退出登录
+                    </button>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- 设置按钮 -->
-    <button class="setting-btn" onclick="toggleSettings()">
-        <div class="bar bar1"></div>
-        <div class="bar bar2"></div>
-    </button>
-
-    <!-- 设置面板 -->
-    <div class="settings-panel" id="settingsPanel" style="display: none;">
-        <div class="settings-title">设置</div>
-        <div class="setting-item">
-            <span class="setting-label">毛玻璃背景</span>
-            <div class="checkbox-wrapper-8">
-                <input type="checkbox" id="glassEffect" class="tgl tgl-skewed" onchange="toggleGlassEffect()">
-                <label class="tgl-btn" data-tg-on="ON" data-tg-off="OFF" for="glassEffect"></label>
-            </div>
-        </div>
-
-        <div class="setting-item">
-            <span class="setting-label">自定义背景</span>
-            <div class="checkbox-wrapper-8">
-                <input type="checkbox" id="customBgToggle" class="tgl tgl-skewed" onchange="toggleCustomBackground()">
-                <label class="tgl-btn" data-tg-on="ON" data-tg-off="OFF" for="customBgToggle"></label>
-            </div>
-        </div>
-
-        <div class="setting-item" id="bgControls" style="display: none; flex-direction: column; gap: 8px; align-items: flex-start;">
-            <label class="setting-label" style="width:100%;">纯色</label>
-            <input type="color" id="bgColorInput" value="#ffffff" onchange="handleColorChange(this)">
-
-            <label class="setting-label" style="width:100%;">图片上传</label>
-            <input type="file" id="bgImageInput" accept="image/*" onchange="handleImageUpload(this)">
-            <div id="bgPreview" style="width:100%; height:60px; background-size:cover; background-position:center; border-radius:6px; border:1px solid #ddd; display:none;"></div>
-
-            <div style="display:flex; gap:6px; width:100%; align-items:center;">
-                <button class="button" onclick="applyPreset('gradient1')"><span class="shadow"></span><span class="edge"></span><span class="front">渐变1</span></button>
-                <button class="button" onclick="applyPreset('gradient2')"><span class="shadow"></span><span class="edge"></span><span class="front">渐变2</span></button>
-                <button class="button" onclick="clearBackground()"><span class="shadow"></span><span class="edge"></span><span class="front">清除</span></button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // 初始化卡片数据
-        let cards = JSON.parse(localStorage.getItem('memoCards')) || [];
-        
-        // 初始化设置
-        let settings = JSON.parse(localStorage.getItem('memoSettings')) || {
-            glassEffect: true,
-            customBackground: false,
-            backgroundColor: '#ffffff',
-            backgroundImage: '',
-            backgroundPreset: ''
-        };
-
-        // 页面加载时初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            // 更新时间显示
-            updateTime();
-            setInterval(updateTime, 1000);
             
-            // 显示所有卡片
-            displayCards();
-            
-            // 应用保存的设置
-            applySettings();
-            // 初始化背景控件显示
-            const customToggle = document.getElementById('customBgToggle');
-            const bgControls = document.getElementById('bgControls');
-            const colorInput = document.getElementById('bgColorInput');
-            const imgInput = document.getElementById('bgImageInput');
-            const preview = document.getElementById('bgPreview');
-            if (customToggle) customToggle.checked = settings.customBackground;
-            if (bgControls) bgControls.style.display = settings.customBackground ? 'flex' : 'none';
-            if (colorInput && settings.backgroundColor) colorInput.value = settings.backgroundColor;
-            if (preview && settings.backgroundImage) { preview.style.display = 'block'; preview.style.backgroundImage = `url(${settings.backgroundImage})`; }
-            applyBackgroundSettings();
-        });
-
-        // 切换设置面板显示/隐藏
-        function toggleSettings() {
-            const panel = document.getElementById('settingsPanel');
-            const toggle = document.querySelector('.setting-btn');
-            
-            if (panel.style.display === 'none') {
-                panel.style.display = 'block';
-                toggle.style.background = 'rgb(110, 90, 200)';
-                toggle.style.boxShadow = '0px 0px 0px 3px rgb(212, 209, 255)';
-            } else {
-                panel.style.display = 'none';
-                toggle.style.background = 'rgb(129, 110, 216)';
-                toggle.style.boxShadow = '0px 0px 0px 2px rgb(212, 209, 255)';
-            }
-        }
-
-        // 切换毛玻璃效果
-        function toggleGlassEffect() {
-            const checkbox = document.getElementById('glassEffect');
-            settings.glassEffect = checkbox.checked;
-            localStorage.setItem('memoSettings', JSON.stringify(settings));
-            applyGlassEffect();
-        }
-
-        // 切换自定义背景开关
-        function toggleCustomBackground() {
-            const checkbox = document.getElementById('customBgToggle');
-            const bgControls = document.getElementById('bgControls');
-            settings.customBackground = checkbox.checked;
-            localStorage.setItem('memoSettings', JSON.stringify(settings));
-            if (bgControls) bgControls.style.display = settings.customBackground ? 'flex' : 'none';
-            applyBackgroundSettings();
-        }
-
-        // 应用所有设置
-        function applySettings() {
-            const checkbox = document.getElementById('glassEffect');
-            if (checkbox) {
-                checkbox.checked = settings.glassEffect;
-            }
-            applyGlassEffect();
-            // 自定义背景
-            const customToggle = document.getElementById('customBgToggle');
-            if (customToggle) customToggle.checked = !!settings.customBackground;
-            applyBackgroundSettings();
-        }
-
-        // 应用毛玻璃效果
-        function applyGlassEffect() {
-            const body = document.body;
-            const memoSection = document.querySelector('.memo-section');
-            const timeCard = document.querySelector('.time-card');
-            
-            if (settings.glassEffect) {
-                // 启用毛玻璃效果
-                body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                if (memoSection) {
-                    memoSection.style.background = 'rgba(255, 255, 255, 0.9)';
-                    memoSection.style.backdropFilter = 'blur(10px)';
-                    memoSection.style.webkitBackdropFilter = 'blur(10px)';
-                }
-                if (timeCard) {
-                    timeCard.style.background = 'linear-gradient(to right, rgb(20, 30, 48), rgb(36, 59, 85))';
-                }
-            } else {
-                // 禁用毛玻璃效果
-                body.style.background = '#f0f0f0';
-                if (memoSection) {
-                    memoSection.style.background = '#ffffff';
-                    memoSection.style.backdropFilter = 'none';
-                    memoSection.style.webkitBackdropFilter = 'none';
-                }
-                if (timeCard) {
-                    timeCard.style.background = 'rgb(17, 4, 134)';
-                }
-            }
-        }
-
-        // 处理颜色变化
-        function handleColorChange(input) {
-            settings.backgroundColor = input.value;
-            settings.backgroundImage = '';
-            settings.backgroundPreset = '';
-            localStorage.setItem('memoSettings', JSON.stringify(settings));
-            applyBackgroundSettings();
-        }
-
-        // 处理图片上传
-        function handleImageUpload(input) {
-            const file = input.files && input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                settings.backgroundImage = e.target.result;
-                settings.backgroundPreset = '';
-                localStorage.setItem('memoSettings', JSON.stringify(settings));
-                const preview = document.getElementById('bgPreview');
-                if (preview) {
-                    preview.style.display = 'block';
-                    preview.style.backgroundImage = `url(${settings.backgroundImage})`;
-                }
-                applyBackgroundSettings();
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // 应用预设
-        function applyPreset(name) {
-            if (name === 'gradient1') {
-                settings.backgroundPreset = 'linear-gradient(135deg,#667eea 0%,#764ba2 100%)';
-            } else if (name === 'gradient2') {
-                settings.backgroundPreset = 'linear-gradient(135deg,#f6d365 0%,#fda085 100%)';
-            }
-            settings.backgroundImage = '';
-            localStorage.setItem('memoSettings', JSON.stringify(settings));
-            applyBackgroundSettings();
-        }
-
-        // 清除自定义背景
-        function clearBackground() {
-            settings.backgroundImage = '';
-            settings.backgroundPreset = '';
-            settings.backgroundColor = '#ffffff';
-            const preview = document.getElementById('bgPreview');
-            const colorInput = document.getElementById('bgColorInput');
-            if (preview) { preview.style.display = 'none'; preview.style.backgroundImage = ''; }
-            if (colorInput) colorInput.value = settings.backgroundColor;
-            localStorage.setItem('memoSettings', JSON.stringify(settings));
-            applyBackgroundSettings();
-        }
-
-        // 将自定义背景应用到页面
-        function applyBackgroundSettings() {
-            const body = document.body;
-            const timeCard = document.querySelector('.time-card');
-
-            if (!settings.customBackground) {
-                // 恢复默认背景（但保留毛玻璃设置的影响）
-                applyGlassEffect();
-                return;
-            }
-
-            // 优先级： 图片 > 预设 > 纯色
-            if (settings.backgroundImage) {
-                body.style.background = `url(${settings.backgroundImage}) center/cover fixed no-repeat`;
-            } else if (settings.backgroundPreset) {
-                body.style.background = settings.backgroundPreset;
-            } else if (settings.backgroundColor) {
-                body.style.background = settings.backgroundColor;
-            }
-
-            // 如果使用图片或深色预设，关闭备忘录透明以保证可读性
-            const memoSection = document.querySelector('.memo-section');
-            if (memoSection) {
-                memoSection.style.background = settings.customBackground && !settings.backgroundImage ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.85)';
-            }
-        }
-
-        // 实时更新时间显示
-        function updateTime() {
-            const now = new Date();
-            
-            // 获取时间
-            let hours = now.getHours();
-            let minutes = now.getMinutes();
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            
-            // 转换为12小时制
-            hours = hours % 12;
-            hours = hours ? hours : 12; // 0点显示为12点
-            
-            // 格式化时间，确保两位数显示
-            minutes = minutes < 10 ? '0' + minutes : minutes;
-            
-            // 获取星期几
-            const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-            const dayOfWeek = weekdays[now.getDay()];
-            
-            // 更新DOM元素
-            const timeElement = document.querySelector('.time-text');
-            const timeSubElement = document.querySelector('.time-sub-text');
-            const dayElement = document.querySelector('.day-text');
-            
-            if (timeElement && timeSubElement && dayElement) {
-                timeElement.innerHTML = `${hours}:${minutes}<span class="time-sub-text">${ampm}</span>`;
-                dayElement.textContent = dayOfWeek;
-            }
-        }
-
-        // 创建新卡片
-        function createCard() {
-            const titleInput = document.getElementById('cardTitle');
-            const contentInput = document.getElementById('cardContent');
-            
-            const title = titleInput.value.trim();
-            const content = contentInput.value.trim();
-            
-            if (!title) {
-                alert('请输入备忘录标题！');
-                titleInput.focus();
-                return;
-            }
-            
-            if (!content) {
-                alert('请输入备忘录内容！');
-                contentInput.focus();
-                return;
-            }
-            
-            const newCard = {
-                id: Date.now(), // 使用时间戳作为唯一ID
-                title: title,
-                content: content,
-                createdAt: new Date().toLocaleString('zh-CN')
-            };
-            
-            cards.unshift(newCard); // 添加到数组开头
-            saveCards();
-            displayCards();
-            
-            // 清空输入框
-            titleInput.value = '';
-            contentInput.value = '';
-            titleInput.focus();
-        }
-
-        // 删除卡片
-        function deleteCard(cardId) {
-            if (confirm('确定要删除这个备忘录吗？')) {
-                cards = cards.filter(card => card.id !== cardId);
-                saveCards();
-                displayCards();
-            }
-        }
-
-        // 清空卡片内容（保留卡片框架）
-        function clearCardContent(cardId) {
-            if (confirm('确定要清空这个备忘录的内容吗？')) {
-                const cardIndex = cards.findIndex(card => card.id === cardId);
-                if (cardIndex !== -1) {
-                    cards[cardIndex].content = '';
-                    saveCards();
-                    displayCards();
-                }
-            }
-        }
-
-        // 编辑卡片内容
-        function editCardContent(cardId) {
-            const card = cards.find(card => card.id === cardId);
-            if (card) {
-                const newContent = prompt('编辑备忘录内容：', card.content);
-                if (newContent !== null) {
-                    card.content = newContent;
-                    saveCards();
-                    displayCards();
-                }
-            }
-        }
-
-        // 保存卡片到localStorage
-        function saveCards() {
-            localStorage.setItem('memoCards', JSON.stringify(cards));
-        }
-
-        // 显示所有卡片
-        function displayCards() {
-            const container = document.getElementById('cardsContainer');
-            const emptyState = document.getElementById('emptyState');
-            
-            container.innerHTML = '';
-            
-            if (cards.length === 0) {
-                emptyState.style.display = 'block';
-                return;
-            }
-            
-            emptyState.style.display = 'none';
-            
-            cards.forEach(card => {
-                const parentElement = document.createElement('div');
-                parentElement.className = 'memo-parent';
-                
-                // 解析创建日期用于日期盒子
-                const createdDate = new Date(card.id);
-                const month = createdDate.getMonth() + 1;
-                const day = createdDate.getDate();
-                
-                parentElement.innerHTML = `
-                    <div class="memo-card">
-                        <button class="button delete-btn" onclick="deleteCard(${card.id})" title="删除整个备忘录">
-                            <span class="shadow"></span>
-                            <span class="edge"></span>
-                            <span class="front">×</span>
-                        </button>
-                        <div class="memo-date-box">
-                            <span class="memo-month">${month}月</span>
-                            <span class="memo-day">${day}</span>
-                        </div>
-                        <div class="memo-content-box">
-                            <div class="memo-title">${escapeHtml(card.title)}</div>
-                            <div class="memo-content" onclick="editCardContent(${card.id})" title="点击编辑内容">
-                                ${card.content ? escapeHtml(card.content) : '<span style="color: #ccc; font-style: italic;">(空内容)</span>'}
-                            </div>
-                            <div class="memo-actions">
-                                <button class="button action-btn clear-btn" onclick="clearCardContent(${card.id})" title="清空内容">
-                                    <span class="shadow"></span>
-                                    <span class="edge"></span>
-                                    <span class="front">清空</span>
-                                </button>
-                                <button class="button action-btn edit-btn" onclick="editCardContent(${card.id})" title="编辑内容">
-                                    <span class="shadow"></span>
-                                    <span class="edge"></span>
-                                    <span class="front">编辑</span>
-                                </button>
-                            </div>
-                            <div class="memo-date">创建于: ${card.createdAt}</div>
-                        </div>
+            <!-- 帖子编辑表单 -->
+            <div id="postForm" style="display: none;">
+                <h4 id="formTitle">新建帖子</h4>
+                <form id="editPostForm">
+                    <input type="hidden" id="postId" value="">
+                    <div class="form-group">
+                        <label for="postTitle">标题</label>
+                        <input type="text" class="form-control" id="postTitle" required>
                     </div>
-                `;
-                container.appendChild(parentElement);
+                    <div class="form-group">
+                        <label for="postContent">内容</label>
+                        <textarea class="form-control" id="postContent" rows="5" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="postCategory">分类</label>
+                        <select class="form-control" id="postCategory">
+                            <option value="学习资料">学习资料</option>
+                            <option value="工具推荐">工具推荐</option>
+                            <option value="经验分享">经验分享</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="postTags">标签（用逗号分隔）</label>
+                        <input type="text" class="form-control" id="postTags" placeholder="例如：JavaScript,编程,教程">
+                    </div>
+                    <button type="submit" class="btn btn-post">保存</button>
+                    <button type="button" id="cancelEditBtn" class="btn btn-secondary">取消</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 帖子列表 -->
+        <div id="postsContainer">
+                <h3 class="mb-4">资源帖子</h3>
+            <div id="postsList" class="row">
+                <!-- 帖子将通过JavaScript动态加载 -->
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        正在加载帖子...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 登录模态框 -->
+    <div id="loginModal" class="login-modal">
+        <div class="login-content">
+            <span class="close">&times;</span>
+                    <h3>管理员登录</h3>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">管理员名称</label>
+                    <input type="text" class="form-control" id="username" placeholder="请输入管理员名称" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" class="form-control" id="password" placeholder="请输入密码" required>
+                </div>
+                <div id="loginMessage" class="alert" style="display: none;"></div>
+                <button type="submit" class="btn btn-admin btn-block">
+                        登录
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript 库 -->
+    <script src="../js/jquery-3.4.1.min.js"></script>
+    <script src="../libs/jquery-confirm/js/jquery-confirm.js"></script>
+    
+    <!-- 自定义脚本 -->
+    <script>
+        $(document).ready(function() {
+            // 初始化帖子数据
+            initPosts();
+            
+            // 登录模态框控制
+            const loginModal = $('#loginModal');
+            const adminLoginBtn = $('#adminLoginBtn');
+            const closeBtn = $('.close');
+            const loginForm = $('#loginForm');
+            const loginMessage = $('#loginMessage');
+            const adminPanel = $('#adminPanel');
+            const newPostBtn = $('#newPostBtn');
+            const logoutBtn = $('#logoutBtn');
+            const postForm = $('#postForm');
+            const editPostForm = $('#editPostForm');
+            const cancelEditBtn = $('#cancelEditBtn');
+            const formTitle = $('#formTitle');
+            
+            // 打开登录模态框
+            adminLoginBtn.click(function() {
+                loginModal.show();
+                $('#username').focus();
             });
-        }
-
-        // HTML转义函数，防止XSS攻击
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // 支持按Enter键快速创建（在内容输入框按Enter）
-        document.getElementById('cardContent').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && e.ctrlKey) {
-                createCard();
+            
+            // 关闭登录模态框
+            closeBtn.click(function() {
+                loginModal.hide();
+                clearLoginForm();
+            });
+            
+            // 点击模态框外部关闭
+            $(window).click(function(event) {
+                if (event.target == loginModal[0]) {
+                    loginModal.hide();
+                    clearLoginForm();
+                }
+            });
+            
+            // 登录表单提交
+            loginForm.submit(function(e) {
+                e.preventDefault();
+                const username = $('#username').val().trim();
+                const password = $('#password').val().trim();
+                
+                // 验证管理员凭据
+                if (username === 'wyf666' && password === '9178') {
+                    // 登录成功
+                    localStorage.setItem('adminLoggedIn', 'true');
+                    loginModal.hide();
+                    clearLoginForm();
+                    showAdminPanel();
+                    showMessage('登录成功！', 'success');
+                } else {
+                    // 登录失败
+                    showLoginMessage('管理员名称或密码错误！', 'danger');
+                }
+            });
+            
+            // 检查是否已登录
+            if (localStorage.getItem('adminLoggedIn') === 'true') {
+                showAdminPanel();
             }
-        });
-        
-        // 键盘输入时自动滚动到可见区域（避免键盘遮挡）
-        document.getElementById('cardContent').addEventListener('focus', function() {
-            setTimeout(() => {
-                this.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 300);
+            
+            // 新建帖子按钮
+            newPostBtn.click(function() {
+                formTitle.text('新建帖子');
+                $('#postId').val('');
+                $('#postTitle').val('');
+                $('#postContent').val('');
+                $('#postCategory').val('学习资料');
+                $('#postTags').val('');
+                postForm.show();
+            });
+            
+            // 取消编辑
+            cancelEditBtn.click(function() {
+                postForm.hide();
+            });
+            
+            // 帖子表单提交
+            editPostForm.submit(function(e) {
+                e.preventDefault();
+                
+                const postId = $('#postId').val();
+                const title = $('#postTitle').val().trim();
+                const content = $('#postContent').val().trim();
+                const category = $('#postCategory').val();
+                const tags = $('#postTags').val().trim();
+                
+                if (!title || !content) {
+                    showMessage('标题和内容不能为空！', 'danger');
+                    return;
+                }
+                
+                let posts = JSON.parse(localStorage.getItem('posts') || '[]');
+                const now = new Date().toLocaleString('zh-CN');
+                
+                if (postId) {
+                    // 编辑现有帖子
+                    const index = posts.findIndex(p => p.id === postId);
+                    if (index !== -1) {
+                        posts[index] = {
+                            ...posts[index],
+                            title,
+                            content,
+                            category,
+                            tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
+                            updatedAt: now
+                        };
+                    }
+                } else {
+                    // 创建新帖子
+                    const newPost = {
+                        id: 'post_' + Date.now(),
+                        title,
+                        content,
+                        category,
+                        tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
+                        createdAt: now,
+                        updatedAt: now
+                    };
+                    posts.unshift(newPost);
+                }
+                
+                localStorage.setItem('posts', JSON.stringify(posts));
+                postForm.hide();
+                loadPosts();
+                showMessage(postId ? '帖子更新成功！' : '帖子创建成功！', 'success');
+            });
+            
+            // 退出登录
+            logoutBtn.click(function() {
+                localStorage.removeItem('adminLoggedIn');
+                adminPanel.hide();
+                showMessage('已退出登录', 'info');
+            });
+            
+            // 初始化帖子数据
+            function initPosts() {
+                // 如果没有帖子数据，创建一些示例帖子
+                if (!localStorage.getItem('posts')) {
+                    const samplePosts = [
+                        {
+                            id: 'post_1',
+                            title: 'JavaScript 学习资源推荐',
+                            content: '这里收集了一些优秀的 JavaScript 学习资源：\n1. MDN 文档：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript\n2. freeCodeCamp：https://www.freecodecamp.org/\n3. JavaScript.info：https://javascript.info/\n4. W3Schools：https://www.w3schools.com/js/',
+                            category: '学习资料',
+                            tags: ['JavaScript', '编程', '教程'],
+                            createdAt: '2024-01-01 10:00:00',
+                            updatedAt: '2024-01-01 10:00:00'
+                        },
+                        {
+                            id: 'post_2',
+                            title: '实用的开发工具推荐',
+                            content: '推荐一些提高开发效率的工具：\n- VS Code：https://code.visualstudio.com/\n- Git：https://git-scm.com/\n- Postman：https://www.postman.com/\n- Figma：https://www.figma.com/\n- Chrome DevTools：https://developer.chrome.com/docs/devtools/',
+                            category: '工具推荐',
+                            tags: ['工具', '开发', '效率'],
+                            createdAt: '2024-01-02 14:30:00',
+                            updatedAt: '2024-01-02 14:30:00'
+                        },
+                        {
+                            id: 'post_3',
+                            title: '前端开发学习路线',
+                            content: '分享一个完整的前端开发学习路线：\n1. HTML/CSS 基础：https://developer.mozilla.org/zh-CN/docs/Learn/HTML\n2. JavaScript 核心：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript\n3. 框架学习（React/Vue）：https://reactjs.org/ 或 https://vuejs.org/\n4. 工程化实践：https://webpack.js.org/',
+                            category: '经验分享',
+                            tags: ['前端', '学习路线', '职业发展'],
+                            createdAt: '2024-01-03 09:15:00',
+                            updatedAt: '2024-01-03 09:15:00'
+                        }
+                    ];
+                    localStorage.setItem('posts', JSON.stringify(samplePosts));
+                }
+                
+                loadPosts();
+            }
+            
+            // 加载帖子
+            function loadPosts() {
+                const posts = JSON.parse(localStorage.getItem('posts') || '[]');
+                const postsList = $('#postsList');
+                
+                if (posts.length === 0) {
+                    postsList.html(`
+                        <div class="col-12">
+                            <div class="alert alert-warning">
+                                暂无帖子，管理员可以登录后创建新帖子。
+                            </div>
+                        </div>
+                    `);
+                    return;
+                }
+                
+                let html = '';
+                posts.forEach(post => {
+                    const tagsHtml = post.tags.map(tag => 
+                        `<span class="badge bg-secondary me-1">${tag}</span>`
+                    ).join('');
+                    
+                    // 处理内容中的链接
+                    let processedContent = post.content.substring(0, 100);
+                    if (post.content.length > 100) {
+                        processedContent += '...';
+                    }
+                    // 将URL转换为链接
+                    processedContent = processedContent.replace(
+                        /(https?:\/\/[^\s]+)/g, 
+                        '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-primary">$1</a>'
+                    );
+                    
+                    html += `
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card post-card">
+                                <div class="card-body">
+                                    <a href="post_detail.html?post_id=${post.id}" class="text-decoration-none text-dark">
+                                        <h5 class="card-title post-title">${post.title}</h5>
+                                        <div class="mb-2">
+                                            <span class="badge bg-primary">${post.category}</span>
+                                            ${tagsHtml}
+                                        </div>
+                                        <div class="card-text post-content">${processedContent}</div>
+                                        <div class="post-meta">
+                                            <small>创建时间: ${post.createdAt}</small>
+                                        </div>
+                                    </a>
+                                    ${localStorage.getItem('adminLoggedIn') === 'true' ? `
+                                        <div class="mt-3">
+                                            <button class="btn btn-sm btn-edit edit-post" data-id="${post.id}">
+                                                编辑
+                                            </button>
+                                            <button class="btn btn-sm btn-delete delete-post" data-id="${post.id}">
+                                                删除
+                                            </button>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                postsList.html(html);
+                
+                // 绑定编辑和删除事件
+                $('.edit-post').click(function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const postId = $(this).data('id');
+                    editPost(postId);
+                });
+                
+                $('.delete-post').click(function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const postId = $(this).data('id');
+                    deletePost(postId);
+                });
+                
+                // 为帖子卡片添加悬停效果
+                $('.post-card').hover(
+                    function() {
+                        $(this).css('cursor', 'pointer');
+                        $(this).find('a').css('text-decoration', 'none');
+                    },
+                    function() {
+                        $(this).find('a').css('text-decoration', 'none');
+                    }
+                );
+            }
+            
+            // 编辑帖子
+            function editPost(postId) {
+                const posts = JSON.parse(localStorage.getItem('posts') || '[]');
+                const post = posts.find(p => p.id === postId);
+                
+                if (post) {
+                    formTitle.text('编辑帖子');
+                    $('#postId').val(post.id);
+                    $('#postTitle').val(post.title);
+                    $('#postContent').val(post.content);
+                    $('#postCategory').val(post.category);
+                    $('#postTags').val(post.tags.join(', '));
+                    postForm.show();
+                }
+            }
+            
+            // 删除帖子
+            function deletePost(postId) {
+                $.confirm({
+                    title: '确认删除',
+                    content: '确定要删除这个帖子吗？此操作不可恢复。',
+                    type: 'red',
+                    buttons: {
+                        确认: {
+                            btnClass: 'btn-red',
+                            action: function() {
+                                let posts = JSON.parse(localStorage.getItem('posts') || '[]');
+                                posts = posts.filter(p => p.id !== postId);
+                                localStorage.setItem('posts', JSON.stringify(posts));
+                                loadPosts();
+                                showMessage('帖子删除成功！', 'success');
+                            }
+                        },
+                        取消: function() {}
+                    }
+                });
+            }
+            
+            // 显示管理员面板
+            function showAdminPanel() {
+                adminPanel.show();
+                loadPosts();
+            }
+            
+            // 显示登录消息
+            function showLoginMessage(message, type) {
+                loginMessage.removeClass('alert-success alert-danger alert-info alert-warning')
+                           .addClass('alert-' + type)
+                           .text(message)
+                           .show();
+            }
+            
+            // 显示消息
+            function showMessage(message, type) {
+                $.alert({
+                    title: type === 'success' ? '成功' : 
+                           type === 'danger' ? '错误' : 
+                           type === 'warning' ? '警告' : '信息',
+                    content: message,
+                    type: type,
+                    buttons: {
+                        确定: function() {}
+                    }
+                });
+            }
+            
+            // 清空登录表单
+            function clearLoginForm() {
+                $('#username').val('');
+                $('#password').val('');
+                loginMessage.hide();
+            }
         });
     </script>
 </body>

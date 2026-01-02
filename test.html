@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试页面 - 个人资源小站</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .info {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>✅ 测试页面 - 个人资源小站</h1>
+    
+    <div class="info">
+        <p>这个页面用于测试你的GitHub Pages部署是否成功。</p>
+        <p>如果能看到这个页面，说明HTML文件可以正常加载。</p>
+    </div>
+    
+    <h2>测试项目：</h2>
+    <ul>
+        <li>✅ HTML解析 - <span class="success">通过</span></li>
+        <li>✅ 中文显示 - <span class="success">通过</span></li>
+        <li>✅ 响应式布局 - <span class="success">通过</span></li>
+        <li>✅ 基础样式 - <span class="success">通过</span></li>
+    </ul>
+    
+    <h2>下一步：</h2>
+    <ol>
+        <li>将你的<code>personal_resource.html</code>文件重命名为<code>index.html</code></li>
+        <li>替换当前的<code>index.html</code>文件</li>
+        <li>上传到GitHub仓库</li>
+        <li>访问你的GitHub Pages网址查看效果</li>
+    </ol>
+    
+    <p><a href="index.html">返回主页面</a></p>
+    
+    <hr>
+    <footer>
+        <p>测试时间：<span id="current-time"></span></p>
+    </footer>
+    
+    <script>
+        // 显示当前时间
+        document.getElementById('current-time').textContent = new Date().toLocaleString('zh-CN');
+        
+        // 简单的控制台测试
+        console.log('测试页面加载成功！');
+        console.log('用户代理：', navigator.userAgent);
+    </script>
+</body>
+</html>
